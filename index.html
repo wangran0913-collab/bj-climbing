@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#8b5cf6">
+<title>北京岩馆速查 · 34 家 · v5.5</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --purple: #8b5cf6;
+  --purple-deep: #6d28d9;
+  --purple-light: #a78bfa;
+  --purple-bg: #f5f3ff;
+  --purple-soft: #ede9fe;
+  --blue: #5b8dff;
+  --blue-deep: #3b6fe6;
+  --blue-soft: #e3edff;
+  --orange: #ff8c5a;
+  --green: #5bc8a6;
+  --pink: #ff8eaf;
+  --ink: #1f1240;
+  --ink-2: #6b5b95;
+  --ink-3: #a89cc5;
+  --bg: #faf7ff;
+  --card: #ffffff;
+  --line: #ede9fe;
+  --shadow: 0 4px 16px rgba(139, 92, 246, 0.08);
+  --shadow-h: 0 6px 24px rgba(139, 92, 246, 0.18);
+}
+html, body {
+  background:
+    radial-gradient(circle at 10% 0%, #efe6ff 0%, transparent 35%),
+    radial-gradient(circle at 95% 100%, #ffe9f0 0%, transparent 30%),
+    var(--bg);
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  min-height: 100vh;
+  font-size: 14px;
+}
+.app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; position: relative; }
+
+/* === 顶部品牌区 === */
+.hero {
+  background: linear-gradient(160deg, #c9bbf3 0%, #e6d9ff 50%, #faf7ff 100%);
+  padding: 22px 18px 24px;
+  border-radius: 0 0 24px 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.hero::before {
+  content: "🧗‍♀️"; position: absolute; right: -8px; bottom: -10px;
+  font-size: 90px; opacity: 0.18; transform: rotate(-12deg);
+}
+.hero .pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.85);
+  color: var(--purple-deep);
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 1.5px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+  backdrop-filter: blur(8px);
+}
+.hero h1 {
+  font-size: 26px; font-weight: 900;
+  line-height: 1.25; letter-spacing: -0.5px;
+  color: var(--ink);
+  position: relative; z-index: 1;
+}
+.hero h1 .accent { color: var(--purple-deep); }
+.hero .tagline {
+  margin-top: 6px;
+  font-size: 12px; color: var(--ink-2);
+  font-weight: 600;
+  position: relative; z-index: 1;
+}
+
+/* === 数据卡 === */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: -12px 12px 14px;
+  position: relative;
+  z-index: 2;
+}
+.stat-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 4px 10px;
+  text-align: center;
+  border: 2px solid #fff;
+  box-shadow: var(--shadow);
+}
+.stat-card .n { font-size: 22px; font-weight: 900; color: var(--purple-deep); line-height: 1; }
+.stat-card .l { font-size: 10px; color: var(--ink-2); margin-top: 4px; font-weight: 600; }
+.stat-card .emo { font-size: 12px; display: block; margin-bottom: 3px; }
+
+/* === 视图 Tab === */
+.view-tabs {
+  display: flex;
+  margin: 0 12px 12px;
+  background: var(--card);
+  border-radius: 100px;
+  padding: 4px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.view-tab {
+  flex: 1;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 13px; font-weight: 800;
+  color: var(--ink-2);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 1;
+  position: relative;
+}
+.view-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-deep) 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+/* === 筛选区 === */
+.filters { padding: 0 12px; margin-bottom: 12px; }
+.filter-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.filter-row.scroll { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; margin-bottom: 4px; }
+.filter-row.scroll::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--card);
+  color: var(--ink-2);
+  font-size: 12px; font-weight: 700;
+  padding: 7px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.chip:hover { border-color: var(--purple-light); }
+.chip.active {
+  background: var(--purple-deep);
+  color: #fff;
+  border-color: var(--purple-deep);
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+}
+.chip .badge {
+  display: inline-block; font-size: 10px;
+  background: rgba(255,255,255,0.25);
+  padding: 1px 6px; border-radius: 100px;
+  margin-left: 2px;
+}
+.chip:not(.active) .badge { background: var(--purple-soft); color: var(--purple-deep); }
+.chip.empty:not(.active) { opacity: 0.45; }
+.chip.empty:not(.active) .badge { background: #eee; color: #999; }
+
+/* 搜索框 */
+.search { position: relative; margin-bottom: 6px; }
+.search input {
+  width: 100%; padding: 10px 14px 10px 36px;
+  border: 1.5px solid var(--line); border-radius: 100px;
+  background: var(--card); font-size: 13px; color: var(--ink);
+  outline: none; transition: border-color 0.15s;
+}
+.search input:focus { border-color: var(--purple); }
+.search::before {
+  content: "🔍"; position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%); font-size: 14px; opacity: 0.5;
+}
+.search .clear {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--ink-3); color: #fff; border: none;
+  font-size: 14px; cursor: pointer; display: none;
+  align-items: center; justify-content: center; line-height: 1;
+}
+.search.has-value .clear { display: flex; }
+
+/* === 列表 === */
+.list { padding: 0 12px; }
+.area-block { margin-bottom: 18px; }
+.area-h {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 6px 4px 10px;
+  border-bottom: 2px dashed var(--purple-soft);
+  margin-bottom: 10px;
+}
+.area-h .title { font-size: 16px; font-weight: 900; color: var(--purple-deep); letter-spacing: -0.3px; }
+.area-h .sub { font-size: 11px; color: var(--ink-2); font-weight: 600; }
+.area-h .meta { margin-left: auto; font-size: 11px; color: var(--purple); background: var(--purple-soft); padding: 2px 8px; border-radius: 100px; font-weight: 700; }
+
+.gym-card {
+  background: var(--card); border-radius: 14px;
+  padding: 14px 14px 12px; margin-bottom: 8px;
+  border: 1.5px solid var(--line); border-left-width: 4px;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.04);
+  transition: all 0.15s; position: relative;
+}
+.gym-card.purple { border-left-color: var(--purple); }
+.gym-card.blue { border-left-color: var(--blue); }
+.gym-card:active { transform: scale(0.98); box-shadow: var(--shadow-h); }
+
+.gym-head { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+.gym-name { font-size: 15px; font-weight: 800; color: var(--ink); flex: 1; line-height: 1.4; }
+.gym-tags { flex-shrink: 0; display: flex; flex-direction: column; gap: 3px; align-items: flex-end; margin-top: 2px; }
+.gym-tag { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 100px; letter-spacing: 0.2px; white-space: nowrap; }
+.gym-tag.purple { background: var(--purple-soft); color: var(--purple-deep); }
+.gym-tag.blue { background: var(--blue-soft); color: var(--blue-deep); }
+
+.gym-en { font-size: 11px; color: var(--ink-3); font-weight: 600; font-family: -apple-system, "Helvetica Neue", sans-serif; margin-bottom: 8px; letter-spacing: 0.2px; }
+.gym-meta { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+.gym-meta .row { display: flex; align-items: flex-start; gap: 4px; }
+.gym-meta .row .ic { flex-shrink: 0; opacity: 0.85; }
+.gym-meta .row .v { flex: 1; word-break: break-word; }
+.gym-meta .row.feat .v { color: var(--ink); font-weight: 600; }
+
+.gym-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--purple-soft); }
+.gym-actions .ab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 9px 6px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  transition: transform 0.12s ease;
+}
+.gym-actions .ab.locate {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(108,40,217,0.38);
+  flex: 1.3;
+}
+.gym-actions .ab.gaode {
+  background: #fff;
+  color: var(--purple-deep);
+  border: 1.5px solid var(--purple-soft);
+  box-shadow: none;
+}
+.gym-actions .ab:active { transform: scale(0.96); }
+
+/* === 地图视图 === */
+.map-view { padding: 0 8px; display: none; }
+.map-view.active { display: block; }
+.list-view.hidden { display: none; }
+
+.map-wrap {
+  background: linear-gradient(135deg, #f4f8ff 0%, #fbfdff 100%);
+  border-radius: 18px;
+  padding: 8px;
+  box-shadow: var(--shadow);
+  border: 2px solid #fff;
+  margin-bottom: 12px;
+  position: relative;
+}
+.map-svg-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 8% 0%, #ffe9f0 0%, transparent 30%),
+    radial-gradient(circle at 96% 4%, #d9e9ff 0%, transparent 34%),
+    linear-gradient(180deg, #f0f6ff 0%, #ffffff 100%);
+  border: 1px solid var(--purple-soft);
+}
+.map-svg { width: 100%; height: 100%; display: block; }
+
+/* 环线 */
+.map-svg .ring { fill: none; stroke-width: 0.35; stroke-dasharray: 1.2 1.2; }
+.map-svg .ring.r6 { stroke: rgba(91,141,255,0.30); }
+.map-svg .ring.r5 { stroke: rgba(91,141,255,0.32); }
+.map-svg .ring.r4 { stroke: rgba(91,141,255,0.45); }
+.map-svg .ring.r3 { stroke: rgba(91,141,255,0.55); }
+.map-svg .ring.r2 { stroke: rgba(255,140,90,0.85); stroke-width: 0.55; stroke-dasharray: none; }
+.map-svg .ring-lbl-bg { fill: #fff; stroke: rgba(91,141,255,0.4); stroke-width: 0.15; }
+.map-svg .ring-lbl-bg.r2 { stroke: rgba(255,140,90,0.6); }
+.map-svg .ring-lbl { font-size: 1.9px; font-weight: 800; fill: var(--blue-deep); }
+.map-svg .ring-lbl.r2 { fill: var(--orange); }
+
+/* 指北针 */
+.map-svg .compass-bg { fill: #fff; stroke: var(--blue); stroke-width: 0.3; }
+.map-svg .compass-arrow { fill: var(--orange); }
+.map-svg .compass-n { font-size: 2.4px; font-weight: 900; fill: var(--blue-deep); }
+
+/* 地标 */
+.map-svg .lm-bg { fill: rgba(255,255,255,0.92); stroke: rgba(106,122,153,0.45); stroke-width: 0.18; stroke-dasharray: 0.5 0.5; }
+.map-svg .lm-text { font-size: 1.95px; font-weight: 800; fill: var(--ink); }
+
+/* 岩馆标点 + 店名胶囊 */
+.dot-purple { fill: var(--purple-deep); stroke: #fff; stroke-width: 0.35; cursor: pointer; transition: all 0.15s; }
+.dot-blue { fill: var(--blue-deep); stroke: #fff; stroke-width: 0.35; cursor: pointer; transition: all 0.15s; }
+.dot-purple:hover, .dot-blue:hover { stroke-width: 0.6; }
+.dot-active { stroke: #ffce42 !important; stroke-width: 0.85 !important; }
+
+.gym-tag-bg { stroke-width: 0.12; cursor: pointer; }
+.gym-tag-bg.purple { fill: #fff; stroke: var(--purple); }
+.gym-tag-bg.blue { fill: #fff; stroke: var(--blue); }
+.gym-tag-bg.active { stroke-width: 0.4 !important; fill: #fff8e0 !important; }
+.gym-tag-text { font-size: 1.85px; font-weight: 800; pointer-events: none; }
+.gym-tag-text.purple { fill: var(--purple-deep); }
+.gym-tag-text.blue { fill: var(--blue-deep); }
+
+.map-tip {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin-top: 8px;
+  font-size: 11px; color: var(--ink-2); font-weight: 600;
+  flex-wrap: wrap;
+}
+.map-tip .item { display: inline-flex; align-items: center; gap: 4px; }
+.map-tip .swatch { width: 10px; height: 10px; border-radius: 50%; }
+.map-tip .swatch.purple { background: var(--purple-deep); }
+.map-tip .swatch.blue { background: var(--blue-deep); }
+
+/* 地图弹卡 */
+.map-popup {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--shadow-h);
+  border: 1.5px solid var(--purple-soft);
+  border-left: 4px solid var(--purple);
+  margin-top: 8px;
+  display: none;
+}
+.map-popup.show { display: block; }
+.map-popup.blue { border-left-color: var(--blue); }
+.map-popup .title-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 4px; }
+.map-popup h3 { font-size: 15px; font-weight: 800; color: var(--ink); flex: 1; line-height: 1.4; }
+.map-popup .small { font-size: 11px; color: var(--ink-3); margin-bottom: 8px; }
+.map-popup .meta-line { font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+.map-popup .feat { color: var(--ink); font-weight: 600; margin-top: 4px; }
+.map-popup .actions { display: flex; gap: 6px; margin-top: 12px; }
+.map-popup .actions a { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; }
+.map-popup .actions a.gaode { background: linear-gradient(135deg, #00b4ff 0%, #0093e9 100%); color: #fff; box-shadow: 0 3px 10px rgba(0,147,233,0.35); }
+.map-popup .actions a.close { background: var(--purple-soft); color: var(--purple-deep); }
+
+.map-hint {
+  text-align: center;
+  font-size: 11px; color: var(--ink-3);
+  margin-top: 6px; font-weight: 600;
+  padding: 0 8px;
+}
+
+/* === 空状态 === */
+.empty { text-align: center; padding: 50px 20px; color: var(--ink-3); }
+.empty .ic { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+.empty .t { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+.empty .s { font-size: 12px; margin-top: 4px; }
+
+/* === 底部栏 === */
+.footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-width: 480px; margin: 0 auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  padding: 10px 14px 14px;
+  display: flex; gap: 8px; z-index: 100;
+}
+.footer .btn {
+  flex: 1; padding: 12px; border-radius: 100px;
+  font-size: 13px; font-weight: 800; text-align: center;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: all 0.15s;
+}
+.footer .btn-primary {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-deep) 100%);
+  color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+.footer .btn-primary:active { transform: scale(0.97); }
+.footer .btn-ghost { background: var(--purple-soft); color: var(--purple-deep); }
+.footer .btn .ic { margin-right: 4px; }
+
+.doc-foot {
+  text-align: center; padding: 12px 20px 4px;
+  font-size: 11px; color: var(--ink-3); font-weight: 600;
+}
+.doc-foot .heart { color: var(--pink); }
+
+@media (max-width: 360px) {
+  .hero h1 { font-size: 22px; }
+  .stat-card .n { font-size: 18px; }
+  .stat-card .l { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶部品牌 -->
+  <div class="hero">
+    <span class="pill">🧗 BEIJING · 2026 · v5.5</span>
+    <h1>北京<span class="accent">岩馆速查</span><br>34 家全收录</h1>
+    <div class="tagline">✦ 8 大城区 · 抱石/难度馆全收录 ✦</div>
+  </div>
+
+  <!-- 数据卡 -->
+  <div class="stats">
+    <div class="stat-card"><span class="emo">🧗</span><div class="n" id="s-total">34</div><div class="l">总数</div></div>
+    <div class="stat-card"><span class="emo">📍</span><div class="n" id="s-area">8</div><div class="l">城区</div></div>
+    <div class="stat-card"><span class="emo">🟦</span><div class="n" id="s-boulder">34</div><div class="l">含抱石</div></div>
+    <div class="stat-card"><span class="emo">🟪</span><div class="n" id="s-diff">19</div><div class="l">含难度</div></div>
+  </div>
+
+  <!-- 视图 Tab -->
+  <div class="view-tabs" id="view-tabs">
+    <div class="view-tab active" data-view="list">📋 列表视图</div>
+    <div class="view-tab" data-view="map">🗺️ 地图视图</div>
+  </div>
+
+  <!-- 筛选 -->
+  <div class="filters">
+    <div class="search" id="search-box">
+      <input id="search" type="text" placeholder="搜店名 / 地铁 / 商圈 / 特色…" autocomplete="off">
+      <button class="clear" id="clear">×</button>
+    </div>
+    <div class="filter-row scroll" id="area-filter">
+      <span class="chip active" data-area="all">🌐 全部 <span class="badge" id="cnt-all">34</span></span>
+      <span class="chip" data-area="north">🧭 北望潮地 <span class="badge">10</span></span>
+      <span class="chip" data-area="south">🌆 朝南都市带 <span class="badge">8</span></span>
+      <span class="chip" data-area="hd_dc">📚 东西双修岩道 <span class="badge">9</span></span>
+      <span class="chip" data-area="outer">🌳 外环新势力 <span class="badge">7</span></span>
+    </div>
+    <div class="filter-row" id="type-filter">
+          <span class="chip active" data-type="all">🎯 全业态 <span class="badge">34</span></span>
+          <span class="chip" data-type="difficulty">🟪 含难度馆 <span class="badge">19</span></span>
+          <span class="chip" data-type="boulder-only">🟦 抱石馆 <span class="badge">15</span></span>
+    </div>
+  </div>
+
+  <!-- 列表视图 -->
+  <div class="list list-view" id="list"></div>
+
+  <!-- 地图视图 -->
+  <div class="map-view" id="map-view">
+    <div class="map-wrap">
+      <div class="map-svg-wrap">
+        <svg class="map-svg" viewBox="0 0 100 115" id="map-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="map-tip">
+          <span class="item"><span class="swatch purple"></span>含难度馆</span>
+          <span class="item"><span class="swatch blue"></span>抱石馆</span>
+        <span class="item">🔵 二/三/四/五/六环</span>
+        <span class="item">🏛️ 地标参考</span>
+      </div>
+    </div>
+    <div class="map-popup" id="map-popup"></div>
+    <div class="map-hint">📍 标记位为大致区位（基于地铁站近似），精度约 500m，详情请点店名</div>
+  </div>
+
+  <!-- 数据脚注 -->
+  <div class="doc-foot">
+    🗓️ 数据更新 2026-05-25<br>
+    Climb on, climb together. <span class="heart">♥</span>
+  </div>
+</div>
+
+<!-- 底部栏 -->
+<div class="footer">
+  <a class="btn btn-ghost" href="#" id="top-btn"><span class="ic">⬆️</span>返回顶部</a>
+  <a class="btn btn-primary" id="doc-btn" href="#" target="_blank"><span class="ic">📋</span>完整文档版</a>
+</div>
+
+<script>
+let DATA = null;
+let state = { view: 'list', area: 'all', type: 'all', q: '', activeGym: null };
+
+// 北京经纬度范围（用于映射到 SVG）
+const BJ_BBOX = { minLng: 116.18, maxLng: 116.68, minLat: 39.82, maxLat: 40.14 };
+function lngLatToXY(lng, lat) {
+  const x = ((lng - BJ_BBOX.minLng) / (BJ_BBOX.maxLng - BJ_BBOX.minLng)) * 100;
+  const y = 100 - ((lat - BJ_BBOX.minLat) / (BJ_BBOX.maxLat - BJ_BBOX.minLat)) * 100;
+  return { x, y };
+}
+
+async function init() {
+  const res = await fetch('./data.json');
+  DATA = await res.json();
+  document.getElementById('doc-btn').href = DATA.doc_url;
+  document.getElementById('s-total').textContent = DATA.stats.total;
+  document.getElementById('s-area').textContent = DATA.stats.districts_count;
+  document.getElementById('s-boulder').textContent = DATA.stats.boulder_count;
+  document.getElementById('s-diff').textContent = DATA.stats.difficulty_count;
+  bindEvents();
+  render();
+}
+
+function bindEvents() {
+  document.getElementById('view-tabs').addEventListener('click', e => {
+    const tab = e.target.closest('.view-tab');
+    if (!tab) return;
+    document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.view = tab.dataset.view;
+    state.activeGym = null;
+    document.getElementById('map-popup').classList.remove('show');
+    render();
+  });
+  document.getElementById('area-filter').addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#area-filter .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.area = chip.dataset.area;
+    render();
+  });
+  document.getElementById('type-filter').addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('#type-filter .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.type = chip.dataset.type;
+    render();
+  });
+  const inp = document.getElementById('search');
+  const box = document.getElementById('search-box');
+  inp.addEventListener('input', e => {
+    state.q = e.target.value.trim().toLowerCase();
+    box.classList.toggle('has-value', !!state.q);
+    render();
+  });
+  document.getElementById('clear').addEventListener('click', () => {
+    inp.value = ''; state.q = ''; box.classList.remove('has-value'); render();
+  });
+  document.getElementById('top-btn').addEventListener('click', e => {
+    e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'});
+  });
+}
+
+function filterGyms() {
+  return DATA.gyms.filter(g => {
+    if (state.area !== 'all' && g.area_id !== state.area) return false;
+    if (state.type === 'difficulty' && !g.has_difficulty) return false;
+    if (state.type === 'boulder-only' && g.has_difficulty) return false;
+    if (state.q) {
+      const text = (g.name + g.name_en + g.district + g.subway + g.feature).toLowerCase();
+      if (!text.includes(state.q)) return false;
+    }
+    return true;
+  });
+}
+
+function render() {
+  updateChipBadges();
+  const filtered = filterGyms();
+  const listView = document.getElementById('list');
+  const mapView = document.getElementById('map-view');
+  if (state.view === 'list') {
+    listView.classList.remove('hidden');
+    mapView.classList.remove('active');
+    renderList(filtered);
+  } else {
+    listView.classList.add('hidden');
+    mapView.classList.add('active');
+    renderMap(filtered);
+  }
+}
+
+// 联动 badge 数字：每个 chip 显示"在另一维度当前筛选下"的剩余店数
+function updateChipBadges() {
+  // 通用过滤器：可指定忽略哪个维度（用于算"如果选了这个 chip 会剩多少"）
+  function countWith(opts) {
+    return DATA.gyms.filter(g => {
+      if (opts.area !== 'all' && g.area_id !== opts.area) return false;
+      if (opts.type === 'difficulty' && !g.has_difficulty) return false;
+      if (opts.type === 'boulder-only' && g.has_difficulty) return false;
+      if (state.q) {
+        const text = (g.name + g.name_en + g.district + g.subway + g.feature).toLowerCase();
+        if (!text.includes(state.q)) return false;
+      }
+      return true;
+    }).length;
+  }
+
+  // 区域 chip：固定 type=当前选中的业态，area 取每个 chip 的值
+  document.querySelectorAll('#area-filter .chip').forEach(chip => {
+    const a = chip.dataset.area;
+    const badge = chip.querySelector('.badge');
+    if (badge) {
+      const n = countWith({ area: a, type: state.type });
+      badge.textContent = n;
+      chip.classList.toggle('empty', n === 0);
+    }
+  });
+
+  // 业态 chip：固定 area=当前选中的区域，type 取每个 chip 的值
+  document.querySelectorAll('#type-filter .chip').forEach(chip => {
+    const t = chip.dataset.type;
+    const badge = chip.querySelector('.badge');
+    if (badge) {
+      const n = countWith({ area: state.area, type: t });
+      badge.textContent = n;
+      chip.classList.toggle('empty', n === 0);
+    }
+  });
+}
+
+function renderList(filtered) {
+  const list = document.getElementById('list');
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><div class="ic">🔍</div><div class="t">没找到匹配的岩馆</div><div class="s">换个关键词或重置筛选试试</div></div>`;
+    return;
+  }
+  const grouped = {};
+  filtered.forEach(g => {
+    if (!grouped[g.area_id]) grouped[g.area_id] = { name: g.area, items: [] };
+    grouped[g.area_id].items.push(g);
+  });
+  const ORDER = ['north','south','hd_dc','outer'];
+  const SUB_NAME = { north: '朝阳·北片', south: '朝阳·南片', hd_dc: '海淀+东城', outer: '京内远郊' };
+  let html = '';
+  ORDER.forEach(aid => {
+    const g = grouped[aid];
+    if (!g) return;
+    const diffN = g.items.filter(x => x.has_difficulty).length;
+    html += `<div class="area-block">
+      <div class="area-h">
+        <span class="title">${g.name}</span>
+        <span class="sub">${SUB_NAME[aid]}</span>
+        <span class="meta">${g.items.length} 家 · 难度 ${diffN}</span>
+      </div>`;
+    g.items.forEach((it, idx) => {
+      html += `<div class="gym-card ${it.type_class}">
+        <div class="gym-head">
+          <div class="gym-name">${escape(it.name)}</div>
+          <div class="gym-tags">
+            ${it.has_difficulty ? '<span class="gym-tag purple">🟪 难度</span>' : ''}
+            <span class="gym-tag blue">🟦 抱石</span>
+          </div>
+        </div>
+        ${it.name_en ? `<div class="gym-en">${escape(it.name_en)}</div>` : ''}
+        <div class="gym-meta">
+          <div class="row"><span class="ic">📍</span><span class="v">${escape(it.district)}</span></div>
+          <div class="row"><span class="ic">🚇</span><span class="v">${escape(it.subway.replace(/^🚇\s*/, ''))}</span></div>
+          <div class="row feat"><span class="ic">✨</span><span class="v">${escape(it.feature)}</span></div>
+        </div>
+        <div class="gym-actions">
+          <a class="ab locate" href="#" onclick="switchToMap('${escape(it.name)}');return false;">🗺️ 在本图查看</a>
+          <a class="ab gaode" href="${it.gaode_url}" target="_blank" rel="noopener">🚀 高德导航</a>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  list.innerHTML = html;
+}
+
+function renderMap(filtered) {
+  const svg = document.getElementById('map-svg');
+  let parts = [];
+
+  // ============= viewBox 100 x 115，地图区域 [4, 4] -> [96, 111] =============
+  const VB_W = 100, VB_H = 115;
+  const PAD = 5; // 左右上下留白
+  const MAP_W = VB_W - 2 * PAD;   // 90
+  const MAP_H = VB_H - 2 * PAD;   // 105
+
+  // 北京经纬度边界（覆盖所有岩馆 + 地标 + 留白）
+  const BBOX = { minLng: 116.16, maxLng: 116.70, minLat: 39.83, maxLat: 40.15 };
+  const LNG_RANGE = BBOX.maxLng - BBOX.minLng;  // 0.54
+  const LAT_RANGE = BBOX.maxLat - BBOX.minLat;  // 0.32
+  const SCALE_X = MAP_W / LNG_RANGE;            // ≈ 167
+  const SCALE_Y = MAP_H / LAT_RANGE;            // ≈ 328
+
+  const toXY = (lng, lat) => ({
+    x: PAD + (lng - BBOX.minLng) * SCALE_X,
+    y: PAD + (BBOX.maxLat - lat) * SCALE_Y,
+  });
+
+  // 天安门为原点（用于环线中心）
+  const tianAnMen = toXY(116.397, 39.908);
+  const CX = tianAnMen.x, CY = tianAnMen.y;
+
+  // ============= 1) 环线（六/五/四/三/二）=============
+  // 实际近似半径（公里）：六环 ~25, 五环 ~15, 四环 ~9, 三环 ~5, 二环 ~3
+  // 1° 纬度 ≈ 111km，1° 经度（北纬40°）≈ 85km
+  const KM_TO_X = SCALE_X / 85;   // viewBox 单位 / km (横)
+  const KM_TO_Y = SCALE_Y / 111;  // viewBox 单位 / km (纵)
+  const RINGS = [
+    { id: 'r6', km: 25, label: '六环' },
+    { id: 'r5', km: 16, label: '五环' },
+    { id: 'r4', km: 10, label: '四环' },
+    { id: 'r3', km: 6,  label: '三环' },
+    { id: 'r2', km: 3.5,label: '二环' },
+  ];
+  RINGS.forEach(r => {
+    const rx = r.km * KM_TO_X;
+    const ry = r.km * KM_TO_Y;
+    parts.push(`<ellipse class="ring ${r.id}" cx="${CX.toFixed(2)}" cy="${CY.toFixed(2)}" rx="${rx.toFixed(2)}" ry="${ry.toFixed(2)}"/>`);
+    // 标签放在环线顶部，但不能溢出 viewBox
+    let ly = CY - ry - 0.4;
+    if (ly < 1.5) ly = 1.5;
+    parts.push(`<rect class="ring-lbl-bg ${r.id}" x="${CX-3.4}" y="${ly-1.7}" width="6.8" height="2.8" rx="1.2"/>`);
+    parts.push(`<text class="ring-lbl ${r.id}" x="${CX}" y="${ly+0.4}" text-anchor="middle">${r.label}</text>`);
+  });
+
+  // ============= 2) 地标参考点 =============
+  const LANDMARKS = [
+    { name: '🏛️ 天安门',  lng: 116.397, lat: 39.908 },
+    { name: '⭐ 国贸',     lng: 116.460, lat: 39.910 },
+    { name: '🏟️ 奥森',    lng: 116.395, lat: 40.010 },
+    { name: '🎓 中关村',  lng: 116.310, lat: 39.975 },
+    { name: '✈️ 望京',    lng: 116.480, lat: 39.997 },
+    { name: '🏗️ 通州',    lng: 116.660, lat: 39.910 },
+    { name: '🏔️ 首钢',    lng: 116.190, lat: 39.918 },
+    { name: '🌳 丰台',    lng: 116.290, lat: 39.851 },
+  ];
+  const placedLM = [];
+  LANDMARKS.forEach(lm => {
+    const { x, y } = toXY(lm.lng, lm.lat);
+    const w = lm.name.length * 1.7 + 2.2;
+    parts.push(`<rect class="lm-bg" x="${(x - w/2).toFixed(2)}" y="${(y-1.4).toFixed(2)}" width="${w.toFixed(2)}" height="2.8" rx="1.4"/>`);
+    parts.push(`<text class="lm-text" x="${x.toFixed(2)}" y="${(y+0.5).toFixed(2)}" text-anchor="middle">${lm.name}</text>`);
+    placedLM.push({ x1: x - w/2, y1: y - 1.4, x2: x + w/2, y2: y + 1.4 });
+  });
+
+  // ============= 3) 指北针 =============
+  parts.push(`<circle class="compass-bg" cx="93" cy="9" r="4"/>`);
+  parts.push(`<polygon class="compass-arrow" points="93,5.5 91.5,10 93,9 94.5,10"/>`);
+  parts.push(`<text class="compass-n" x="93" y="13.6" text-anchor="middle">N</text>`);
+
+  // ============= 4) 岩馆标点 + 店名标签 =============
+  const points = filtered.map(g => {
+    const xy = toXY(g.lng, g.lat);
+    return { gym: g, x: xy.x, y: xy.y };
+  });
+
+  // 计算店名标签 + 简单的偏移避让
+  // 默认标签在 dot 右上方；如果右边超出，放左边
+  const placed = [...placedLM]; // 初始包含所有地标的占位区
+  function shortName(name) {
+    // 截短策略：去掉品牌名前缀，或取核心
+    if (name.length > 7) return name.slice(0, 6) + '…';
+    return name;
+  }
+  function rectsOverlap(a, b) {
+    return !(a.x2 < b.x1 || a.x1 > b.x2 || a.y2 < b.y1 || a.y1 > b.y2);
+  }
+
+  points.forEach(p => {
+    const isActive = state.activeGym === p.gym.name;
+    const cls = p.gym.has_difficulty ? 'purple' : 'blue';
+    const dotCls = p.gym.has_difficulty ? 'dot-purple' : 'dot-blue';
+    const label = shortName(p.gym.name);
+    const labelW = label.length * 1.95 + 1.6;
+    const labelH = 2.6;
+
+    // 候选位置（围绕 dot）
+    const candidates = [
+      { dx: 1.6, dy: -2.8 },  // 右上
+      { dx: 1.6, dy: 1.6 },   // 右下
+      { dx: -1.6 - labelW, dy: -2.8 }, // 左上
+      { dx: -1.6 - labelW, dy: 1.6 },  // 左下
+      { dx: -labelW/2, dy: -3.6 },     // 正上
+      { dx: -labelW/2, dy: 2.0 },      // 正下
+    ];
+
+    let chosen = candidates[0];
+    for (const c of candidates) {
+      const lx = p.x + c.dx;
+      const ly = p.y + c.dy;
+      // 边界检查
+      if (lx < 0.5 || lx + labelW > 99.5 || ly < 1 || ly + labelH > 113) continue;
+      const r = { x1: lx, y1: ly, x2: lx + labelW, y2: ly + labelH };
+      if (!placed.some(pp => rectsOverlap(pp, r))) {
+        chosen = c;
+        placed.push(r);
+        break;
+      }
+    }
+
+    const lx = p.x + chosen.dx;
+    const ly = p.y + chosen.dy;
+    const r = { x1: lx, y1: ly, x2: lx + labelW, y2: ly + labelH };
+    if (!placed.includes(r)) placed.push(r);
+
+    // 渲染标签（在 dot 之前以便 dot 盖在上面）
+    parts.push(`<rect class="gym-tag-bg ${cls} ${isActive?'active':''}" x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" width="${labelW.toFixed(2)}" height="${labelH}" rx="1.0" data-name="${escape(p.gym.name)}"/>`);
+    parts.push(`<text class="gym-tag-text ${cls}" x="${(lx+labelW/2).toFixed(2)}" y="${(ly+1.85).toFixed(2)}" text-anchor="middle">${escape(label)}</text>`);
+
+    // dot
+    parts.push(`<circle class="${dotCls} ${isActive?'dot-active':''}" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${isActive?1.8:1.3}" data-name="${escape(p.gym.name)}"/>`);
+  });
+
+  svg.innerHTML = parts.join('');
+
+  // 绑定标点 & 标签 点击
+  svg.querySelectorAll('[data-name]').forEach(c => {
+    c.addEventListener('click', () => {
+      const name = c.getAttribute('data-name');
+      state.activeGym = name;
+      const gym = DATA.gyms.find(g => g.name === name);
+      if (gym) showPopup(gym);
+      renderMap(filterGyms());
+    });
+  });
+
+  if (state.activeGym) {
+    const gym = DATA.gyms.find(g => g.name === state.activeGym);
+    if (gym) showPopup(gym);
+  } else {
+    document.getElementById('map-popup').classList.remove('show');
+  }
+}
+
+function showPopup(gym) {
+  const pop = document.getElementById('map-popup');
+  pop.className = 'map-popup show ' + gym.type_class;
+  pop.innerHTML = `
+    <div class="title-row">
+      <h3>${escape(gym.name)}</h3>
+      <div class="gym-tags">
+        ${gym.has_difficulty ? '<span class="gym-tag purple">🟪 难度</span>' : ''}
+        <span class="gym-tag blue">🟦 抱石</span>
+      </div>
+    </div>
+    ${gym.name_en ? `<div class="small">${escape(gym.name_en)}</div>` : ''}
+    <div class="meta-line">📍 ${escape(gym.district)} · ${escape(gym.area)}</div>
+    <div class="meta-line">🚇 ${escape(gym.subway.replace(/^🚇\s*/, ''))}</div>
+    <div class="meta-line feat">✨ ${escape(gym.feature)}</div>
+    <div class="actions">
+      <a class="gaode" href="${gym.gaode_url}" target="_blank" rel="noopener">🚀 去高德导航</a>
+      <a class="close" href="#" onclick="closePopup();return false;">关闭</a>
+    </div>
+  `;
+  // 滚动到弹卡可见区域
+  setTimeout(() => {
+    pop.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+function closePopup() {
+  state.activeGym = null;
+  document.getElementById('map-popup').classList.remove('show');
+  renderMap(filterGyms());
+}
+function switchToMap(name) {
+  state.view = 'map';
+  state.activeGym = name;
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === 'map'));
+  render();
+  setTimeout(() => {
+    document.getElementById('map-view').scrollIntoView({behavior: 'smooth', block: 'start'});
+  }, 100);
+}
+window.switchToMap = switchToMap;
+window.closePopup = closePopup;
+
+function escape(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+init();
+</script>
+</body>
+</html>
